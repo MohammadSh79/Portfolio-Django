@@ -18,11 +18,6 @@ class CustomUserManager(UserManager):
         return user
 
     def create_superuser(self, username, email=None, password=None, **extra_fields):
-        extra_fields.setdefault("is_superuser", True)
-
-        if extra_fields.get("is_superuser") is not True:
-            raise ValueError("Superuser must have is_superuser=True.")
-
         return self.create_user(username, email, password, **extra_fields)
 
     def get_by_natural_key(self, username):
@@ -30,11 +25,12 @@ class CustomUserManager(UserManager):
 
 class User(AbstractBaseUser):
     username = models.CharField(max_length=30, unique=True, blank=False, null=False)
-    firstname = models.CharField(max_length=30, unique=False, blank=True, null=True)
-    lastname = models.CharField(max_length=30, unique=False, blank=True, null=True)
-    title = models.CharField(max_length=30, unique=False, blank=True, null=True)
-    email = models.CharField(max_length=30, unique=True, blank=False, null=False)
+    firstname = models.CharField(max_length=30, blank=True, null=True)
+    lastname = models.CharField(max_length=30, blank=True, null=True)
+    title = models.CharField(max_length=50, blank=True, null=True)
+    email = models.CharField(max_length=50, blank=False, null=False)
     avatar = models.ImageField(upload_to='avatars/', blank=False, null=False, default='avatars/default.png')
+    aboutme = models.CharField(max_length=300, blank=False, null=False)
 
     objects = CustomUserManager()
 
