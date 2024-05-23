@@ -30,7 +30,7 @@ class User(AbstractBaseUser):
     title = models.CharField(max_length=50, blank=True, null=True)
     email = models.CharField(max_length=50, blank=False, null=False)
     avatar = models.ImageField(upload_to='avatars/', blank=False, null=False, default='avatars/default.png')
-    aboutme = models.CharField(max_length=300, blank=False, null=False)
+    aboutme = models.TextField(max_length=300, blank=True, null=True)
 
     objects = CustomUserManager()
 
