@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, UserManager
 
@@ -14,16 +15,22 @@ class CustomUserManager(UserManager):
         username = GlobalUserModel.normalize_username(username)
         user = self.model(username=username, email=email, **extra_fields)
         user.password = make_password(password)
+        user.is_staff = False
+        user.is_superuser = False
         user.save(using=self._db)
         return user
 
     def create_superuser(self, username, email=None, password=None, **extra_fields):
-        return self.create_user(username, email, password, **extra_fields)
+        user = self.create_user(username, email, password, **extra_fields)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
+        return user
 
     def get_by_natural_key(self, username):
         return self.get(username__iexact=username)
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=30, unique=True, blank=False, null=False)
     firstname = models.CharField(max_length=30, blank=True, null=True)
     lastname = models.CharField(max_length=30, blank=True, null=True)
@@ -31,6 +38,7 @@ class User(AbstractBaseUser):
     email = models.CharField(max_length=50, blank=False, null=False)
     avatar = models.ImageField(upload_to='avatars/', blank=False, null=False, default='avatars/default.png')
     aboutme = models.TextField(max_length=300, blank=True, null=True)
+    is_staff = models.BooleanField(default=False, blank=False, null=False)
 
     objects = CustomUserManager()
 
